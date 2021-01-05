@@ -1,0 +1,1025 @@
+<html>
+<head>
+
+	<style>
+		canvas{
+			background: #dddddd;
+		}
+	</style>
+
+	<script>
+		// timer class to display enemies and object at a certain time
+		class timerClass{
+			constructor(timeIntervalMS){
+				// Initialize oldTime to be the time of creation
+				this.oldTime = new Date();
+
+				// Set interval to elapse before the timer fires
+				this.interval = timeIntervalMS;
+				
+				// Keeps track of the # of milliseconds accumulated since the last firing
+				this.accum = 0;
+			}
+			
+			
+		
+		
+			
+			// This method returns true if the timer is ready to fire, false otherwise
+			// If it returns true, then resets fire interval
+			isReady(){
+				var curTime = new Date();
+				var delta = curTime - this.oldTime;
+
+				this.accum += delta;
+				this.oldTime = curTime;
+				if (this.accum > this.interval){
+					this.accum = 0;
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+		}
+		
+		//class for powerups
+		class powerupClass{
+			constructor(powerupX, powerupY){
+				this.x = powerupX;
+				this.y = powerupY;
+				this.width = 30;
+				this.height = 30;
+				this.img = new Image();
+				this.img.src = "powerup.jpg";
+				this.bVisible = false;
+			
+			
+			
+			}
+			//moves it to the left when it is visible
+			move(){
+				if(this.bVisible == true){
+					this.x-=8;
+										
+				}
+																			
+			}
+			
+			//draws it when bVisible is true
+			draw(){
+				if(this.bVisible == true){
+					c.drawImage(this.img, this.x, this.y, this.width, this.height);
+				}
+			}
+			
+			// X is set to a large number so it takes time to show up on the screen
+			update(){
+				if(this.x == -100){
+					
+					this.x = 10500
+					//this.x-=100;
+					this.y = Math.floor(Math.random()*500)+50;
+				
+				
+				}
+			
+			
+			}
+		
+		}
+		
+		//class for fireball
+		class fireballClass{
+			constructor(fireballX, fireballY){
+				this.x = fireballX;
+				this.y = fireballY;
+				this.width = 30;
+				this.height = 30;
+				this.img = new Image();
+				this.img.src = "fireball.png";
+				this.bVisible = false;
+			
+			
+			
+			}
+			
+			draw(){
+				if(this.bVisible == true){
+					c.drawImage(this.img, this.x, this.y, this.width, this.height);
+				}
+			}
+			
+			update(){
+				if (this.bVisible == true){
+					this.x -= 10;
+					if (this.x > 800){
+						this.bVisible = false;
+					}
+				}
+			}
+		
+		
+		}
+		
+		
+		class lightningClass{
+			constructor(lightningX, lightningY){
+				this.x = lightningX;
+				this.y = lightningY;
+				this.width = 25;
+				this.height = 50;
+				this.img = new Image();
+				this.img.src = "lightning.png";
+				this.bVisible = false;
+		
+			}
+			
+			draw(){
+				if(this.bVisible == true){
+					c.drawImage(this.img, this.x, this.y, this.width, this.height);
+				}
+			}
+			
+			update(){
+				if (this.bVisible == true){
+					this.x += 10;
+					if (this.x > 800){
+						this.bVisible = false;
+					}
+				}
+			}
+			
+			intersects(obj){
+				if (this.x < obj.x + obj.width &&
+					this.x + this.width > obj.x &&
+					this.y < obj.y + obj.height &&
+					this.y + this.height > obj.y)
+				{
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+		}
+		
+		
+		class zuesClass{
+			constructor(){
+				this.x = 100;
+				this.y = 550;
+				this.width = 50;
+				this.height = 100;
+				this.img = new Image();
+				this.img.src = "zues.png";
+				this.bInAir = false;
+				this.curYspeed = 0;				
+			}
+
+			fly(){
+				if(this.bInAir == false){
+					this.bInAir = true;
+					this.curYspeed = -5;
+					
+				}
+			
+			}
+			
+			update(){
+				if (this.bInAir == true){
+					this.y += this.curYspeed;
+					this.curYspeed++;					
+					
+					
+					// Check to see if the bird landed
+					if (this.y >= 550){
+						this.bInAir = false;
+						this.curYspeed = 0;
+					}
+				}
+				
+			
+			}
+			
+			draw(){
+				c.drawImage(this.img, this.x, this.y, this.width, this.height);
+						
+			}
+			
+			intersects(obj){
+				if (this.x < obj.x + obj.width &&
+					this.x + this.width > obj.x &&
+					this.y < obj.y + obj.height &&
+					this.y + this.height > obj.y)
+				{
+					return true;
+				}
+				else{
+					return false;
+				}
+			}
+		}
+		
+		class dragonClass{
+			constructor(dragonX, dragonY, dragonWidth, dragonHeight, dragonImg){
+				this.x = dragonX;
+				this.y = dragonY;
+				this.width = dragonWidth;
+				this.height = dragonHeight;
+				this.img = new Image();
+				this.img.src = dragonImg;
+				this.bVisible = false;
+							
+			}
+			
+			fly(){
+				console.log(this.y)
+				if(this.bVisible == true){
+					this.x-=5;
+										
+				}
+				
+				
+				
+				
+			
+			
+			}
+			
+			update(){
+				if(this.x == -100){
+					
+					this.x = 1500
+					this.y = Math.floor(Math.random()*500)+50;
+				
+				
+				}
+			
+			
+			}
+			
+			draw(){
+				if(this.bVisible == true){
+					c.drawImage(this.img, this.x, this.y, this.width, this.height);
+				
+				}
+			
+			}
+			
+				
+		}
+		
+		class minotaurClass{
+			constructor(minotaurX, minotaurY, minotaurWidth, minotaurHeight, minotaurImg){
+				this.x = minotaurX;
+				this.y = minotaurY;
+				this.width = minotaurWidth;
+				this.height = minotaurHeight;
+				this.img = new Image();
+				this.img.src = minotaurImg;
+				this.bVisible = false;
+							
+			}
+			
+			move(){
+				if(this.bVisible == true){
+					this.x-=10;
+										
+				}
+																			
+			}
+			
+			update(){
+				if(this.x == -100){
+					
+					this.x = 2500
+					this.y = Math.floor(Math.random()*500)+50;
+				
+				
+				}
+			
+			
+			}
+			
+			draw(){
+				if(this.bVisible == true){
+					c.drawImage(this.img, this.x, this.y, this.width, this.height);
+				
+				}
+			
+			}
+		}
+		
+		
+		
+		class spearClass{
+			constructor(spearX, spearY, spearWidth, spearHeight, spearImg){
+				this.x = spearX;
+				this.y = spearY;
+				this.width = spearWidth;
+				this.height = spearHeight;
+				this.img = new Image();
+				this.img.src = spearImg;
+				this.bVisible = false;
+							
+			}
+			
+			move(){
+				if(this.bVisible == true){
+					this.x-=10;
+										
+				}
+																			
+			}
+			
+			update(){
+				if(this.x == -100){
+					
+					this.x = 2500
+					this.y = Math.floor(Math.random()*500)+50;
+				
+				
+				}
+			
+			
+			}
+			
+			draw(){
+				if(this.bVisible == true){
+					c.drawImage(this.img, this.x, this.y, this.width, this.height);
+				
+				}
+			
+			}
+		}
+		
+		
+		
+						
+		
+		//infinite background
+		class infiniteScrollingBackgroundClass{
+			constructor(bgSrc,						// Name of the image file (string)
+						bgSpeed)					// Speed of scrolling (integer)
+			{
+				this.img = new Image();
+				this.img.src = bgSrc;
+				this.x1 = 0;
+				this.x2 = cWidth;
+				this.speed = bgSpeed;
+			}
+
+			// Scrolls the background image to the right
+			// (So the character looks like it's moving to the left)
+			scrollRight(){
+				this.x1 += this.speed;
+				this.x2 += this.speed;
+
+				if (this.x2 > cWidth){
+					this.x1 = -cWidth;
+					this.x2 = 0;
+				}
+			}
+
+
+			// Scrolls the background image to the left
+			// (So the character looks like it's moving to the right)
+			scrollLeft(){
+				this.x1 -= this.speed;
+				this.x2 -= this.speed;
+				
+				
+				if (this.x2 < 0){
+					this.x1 = 0;
+					this.x2 = cWidth;
+				}
+			}
+
+
+			// Draw the background image
+			draw(){
+				c.drawImage(this.img, this.x1, 0, cWidth, cHeight);
+				c.drawImage(this.img, this.x2, 0, cWidth, cHeight);
+			}
+		}
+		
+		//bubblesort for gamescore
+		function bubblesort(inputArray){
+				var arraySize = inputArray.length;
+				
+				if(arraySize < 2){
+					return inputArray;
+				}
+				
+				var sortDone;
+				
+				do{
+					
+					sortDone = true;
+					
+					for(var i = 0; i< arraySize-1;i++){
+						if(inputArray[i] > inputArray[i+1]){
+						
+							sortDone = false;
+							
+							var temp = inputArray[i];
+							inputArray[i] = inputArray[i+1];
+							inputArray[i+1] = temp;
+						}
+					}
+				}while(sortDone == false)
+			
+				return inputArray;
+		}
+		
+		// Canvas context; used to call Canvas methods
+		var c;
+
+		// Canvas width and height.
+		var cWidth = 800, cHeight = 600;
+
+		// Stores the current keyboard state
+		var curkeys = [];
+		
+		// Stores keys that have been newly pressed since last update
+		var newkeys = [];
+		
+		// Game State
+		var gameState = "intro";
+		
+		var zues = new zuesClass();
+		
+		var myBackground = new infiniteScrollingBackgroundClass("background.png", 3)
+		
+		var dragonRandY = Math.floor(Math.random()*500)+50;
+		var dragon = new dragonClass(800, dragonRandY, 100, 100, "dragon.png");
+		var dragonTimer = new timerClass(2000);
+		
+		
+		
+		var minotaurRandY = Math.floor(Math.random()*500)+50;
+		var minotaur = new minotaurClass(800, minotaurRandY, 75, 75, "minotaur.png");
+		var minotaurTimer = new timerClass(10000);
+		
+		
+		var spearRandY = Math.floor(Math.random()*500)+50;
+		var spear = new spearClass(800, spearRandY, 150, 50, "spear.png");
+		var spearTimer = new timerClass(500);
+		
+		
+		var powerupRandY = Math.floor(Math.random()*500)+50;
+		var powerup = new powerupClass(12500, powerupRandY);
+		var powerupTimer = new timerClass(1000);
+		
+		var backImg = new Image();
+		backImg.src = "gameover.jpg";
+		
+		
+		var backIntroImg = new Image();
+		backIntroImg.src = "intro.jpg";
+		
+		var titleImg = new Image();
+		titleImg.src = "titleimage.png";
+		
+		var PImg = new Image();
+		PImg.src = "ptoplay.png";
+		
+		var IImg = new Image();
+		IImg.src = "iforinstructions.png";
+		
+		var instruct1Img = new Image();
+		instruct1Img.src = "instruct1.png";
+		
+		var instruct2Img = new Image();
+		instruct2Img.src = "instruct2.png";
+		
+		var instruct3Img = new Image();
+		instruct3Img.src = "instruct3.png";
+		
+		var instruct4Img = new Image();
+		instruct4Img.src = "instruct4.png";
+		
+		
+		var fireballArray = [];
+		for(i = 0;i < 100; i++){
+			fireballArray[i] = new fireballClass(0,0);
+		
+		}
+		var fireballIndex = 0;
+		
+		var fireballTimer = new timerClass(1000);
+		
+		var meterTracker = 0;
+		
+		var finalDistance = 0;
+		
+		
+		
+		
+		var lightningTimer = new timerClass(5000);
+		
+		var lightningMode = false;
+				
+		var lightningArray = [];
+		for(i = 0;i < 100; i++){
+			lightningArray[i] = new lightningClass(0,0);
+		
+		}
+		
+		var lightningIndex = 0;
+		
+		
+		
+		var scoreArray = [];
+		
+		var lightningCounter = 0;
+		
+		var score1 = 0;
+		var score2 = 0;
+		var score3 = 0;
+		var score4 = 0;
+		var score5 = 0;
+		var score6 = 0;
+		var score7 = 0;
+		var score8 = 0;
+		var score9 = 0;
+		var score10 = 0;
+		var score11 = 0;
+		 
+		var Attempts = 0;
+		
+		
+		var PlayMusic = new Audio('playmusic.mp3');
+		
+		var GameOverMusic = new Audio('gameover.mp3');
+		
+		var IntroMusic = new Audio('intro.mp3');
+		
+		var PlayMusicTimer = new timerClass(100);
+		var PlayMusicTimer2 = new timerClass(144000);
+		// Initializes entire game framework. This method should only be called
+		// once, by the body onload event handler.
+		function gameFrameworkInit(){		
+			// Initialize key arrays
+			for (i = 0; i < 256; i++){
+				curkeys[i] = false;
+				newkeys[i] = false;
+			}
+		
+			// Initialize global variables for canvas
+			c = myCanvas.getContext('2d');
+			cWidth = myCanvas.width;
+			cHeight = myCanvas.height;
+
+
+			// Start listeners for getting keyboard state
+	        window.addEventListener('keydown',
+	        						 function(e){
+										if (!curkeys[e.keyCode]){
+											curkeys[e.keyCode] = true;
+											newkeys[e.keyCode] = true;
+										}
+									 }
+	        					   );
+	        
+	        window.addEventListener('keyup',
+	        						 function(e){ curkeys[e.keyCode] = false; }
+	        					   );
+
+			// Schedule the update function to be called right before the next repaint.
+			// (At the end of the update function, it will schedule itself to be called
+			// again before the NEXT repaint, and so on.
+			window.requestAnimationFrame(gameUpdate);
+		}
+
+
+
+
+		function gameUpdate(){
+			//displays enemies on the timer
+				
+			if(gameState == "play"){
+				PlayMusic.play();
+				myBackground.scrollLeft();
+					if(dragonTimer.isReady() ==true){
+						dragon.bVisible = true;
+					}
+					
+					if(minotaurTimer.isReady() ==true){
+						minotaur.bVisible = true;
+					}
+					
+					if(spearTimer.isReady() ==true){
+						spear.bVisible = true;
+					}
+					
+					if(powerupTimer.isReady() ==true){
+						powerup.bVisible = true;
+					}
+					
+				meterTracker += .01;
+				
+				
+				IntroMusic.pause();
+				
+				//turns lightning mode on when zeus hits the powerup
+				if(zues.intersects(powerup)== true){
+					lightningMode = true;
+					powerup.bVisible = false;
+					lightningCounter = 0;
+								
+				}
+				
+				//code fore lightning array to display properly
+				if(lightningMode == true){
+					if(lightningIndex == 100){
+						lightningIndex = 0;
+				
+					}
+				
+					if(newkeys[76]){
+						lightningArray[lightningIndex].x = zues.x - 10;
+						lightningArray[lightningIndex].y = zues.y + 40;
+						lightningArray[lightningIndex].bVisible = true;
+						lightningIndex++;
+						lightningCounter++;
+					}
+					
+					
+				
+				}
+				
+				//update the lightning array and Lightning mode
+				for(i = 0; i < 100; i++){
+					lightningArray[i].update();
+				}
+				
+				
+				if(lightningMode == true){
+					if(lightningTimer.isReady() == true){
+						lightningMode = false;
+				
+				
+				
+					}
+				}
+				
+				//cant shoot more than 5 lightning
+				if(lightningCounter == 5){
+					lightningMode = false;
+				
+				
+				
+				}
+				
+				
+				
+				//Intersect code for the lightning and other enemies
+				for(i = 0; i < 100; i++){
+					if(lightningArray[i].intersects(dragon) == true){
+						dragon.x = 1500;
+						dragon.x -= 10;
+						dragon.y = Math.floor(Math.random()*500)+50;
+						
+			
+					}
+				}	
+				//Intersect code for the lightning and other enemies
+				for(i = 0; i < 100; i++){
+					if(lightningArray[i].intersects(minotaur) == true){
+						minotaur.x = 1500;
+						minotaur.x -= 10;
+						minotaur.y = Math.floor(Math.random()*500)+50;
+					}
+				}
+				//Intersect code for the lightning and other enemies
+				for(i = 0; i < 100; i++){
+					if(lightningArray[i].intersects(spear) == true){
+						spear.x = 1500;
+						spear.x -= 10;
+						spear.y = Math.floor(Math.random()*500)+50;
+					}
+				}
+	
+			}
+			
+			
+			dragon.fly();
+			minotaur.move();
+			spear.move();
+			powerup.move();
+			
+			
+			//keeps character in air
+			if(curkeys[38]){	// up arrow
+				zues.curYspeed-=1.5;
+				zues.fly();
+				if(zues.y <=10){
+					zues.y = 0
+					zues.curYspeed=0.5;
+					zues.fly();
+				}
+			}
+			
+			if(dragon.bVisible == true){	// ENTER
+				if(fireballIndex == 100){
+					fireballIndex = 0;
+				
+				}
+				if(fireballTimer.isReady() ==true){
+					fireballArray[fireballIndex].x = dragon.x - 10;
+					fireballArray[fireballIndex].y = dragon.y + 40;
+					fireballArray[fireballIndex].bVisible = true;
+					fireballIndex++;
+				}
+			}
+			
+			for(i = 0; i < 100; i++){
+				fireballArray[i].update();
+			}
+			
+			dragon.update();
+			
+			
+			minotaur.update();
+			
+			powerup.update();
+			
+			
+			spear.update();
+			
+			
+			zues.update();
+			
+			
+			
+			
+			
+			//Intersect for when the enemies hit Zeus, he loses
+			for(i = 0; i < 100; i++){
+				if(zues.intersects(fireballArray[i]) == true){
+					gameState = "gameover"
+			
+				}
+			}
+			
+			if(zues.intersects(dragon) == true){
+					gameState = "gameover"
+			
+			}
+			
+			if(zues.intersects(minotaur) == true){
+					gameState = "gameover"
+			
+			}
+			
+			if(zues.intersects(spear) == true){
+					gameState = "gameover"
+			
+			}
+			
+			if(gameState == "gameover"){
+				PlayMusic.pause();
+				GameOverMusic.play();
+				if(newkeys[80]){
+					gameState = "play"
+					spear.x = 2500
+					minotaur.x = 2500
+					dragon.x = 1500
+					meterTracker = 0;
+					lightningMode = false;
+					powerup.x = 10500;
+					Attempts++;
+					//powerup.y = Math.floor(Math.random()*500)+50;
+					PlayMusic.play();
+				}
+				
+				finalDistance = meterTracker;
+				
+				
+				
+				if(Attempts == 0){
+					score1 = meterTracker;
+				
+				
+				}
+				
+				if(Attempts == 1){
+					score2 = meterTracker;
+				
+				
+				}
+				
+				if(Attempts == 2){
+					score3 = meterTracker;
+				
+				
+				}
+				
+				if(Attempts == 3){
+					score4 = meterTracker;
+				
+				
+				}
+				
+				if(Attempts == 4){
+					score5 = meterTracker;
+				
+				
+				}
+				
+				if(Attempts == 5){
+					score6 = meterTracker;
+				
+				
+				}
+				
+				if(Attempts == 6){
+					score7 = meterTracker;
+				
+				
+				}
+				
+
+				
+				
+				
+				scoreArray[1] = score1;
+				scoreArray[2] = score2;
+				scoreArray[3] = score3;
+				scoreArray[4] = score4;
+				scoreArray[5] = score5;
+				scoreArray[6] = score6;
+				scoreArray[7] = score7;
+				scoreArray[8] = score8;
+	
+				bubblesort(scoreArray);
+				
+			
+						
+			}
+			
+			if(gameState == "intro"){
+				IntroMusic.play();
+				if(newkeys[80]){
+					gameState = "play"
+					spear.x = 2500
+					minotaur.x = 2500
+					dragon.x = 1500
+				
+				}
+				if(newkeys[73]){
+					gameState = "instructions"
+					
+				}			
+			}
+			
+			if(gameState == "instructions"){
+				if(newkeys[80]){
+					gameState = "play"
+					spear.x = 2500
+					minotaur.x = 2500
+					dragon.x = 1500
+				
+				}
+			
+			
+			
+			}
+			
+			
+			
+			
+			
+			// DO NOT ADD OR MODIFY ANY CODE BELOW HERE
+
+
+			// Reset newkeys
+			for (i = 0; i < 256; i++){
+				newkeys[i] = false;
+			}
+
+			// At the end of the update function, repaint the screen
+			gameDraw();
+				
+			// Last thing the update function does is to schedule itself to be called
+			// again before the next repaint
+			window.requestAnimationFrame(gameUpdate);
+		}
+
+
+		function gameDraw(){
+			// Clear the canvas before we draw the current frame
+			c.clearRect(0,0,cWidth,cHeight);
+
+			// Draw the background
+		//	c.drawImage("background.png", 0, 0, 800, 600);
+			if(gameState == "play"){
+				myBackground.draw();
+				c.fillText("Meters: " + Math.round(meterTracker), 550, 750);
+				
+				if(lightningMode == true){
+					c.fillText("Powerup Mode ACTIVATED" , 50, 750);
+					c.fillText("Press L" , 50, 770);
+				
+				
+				}
+				
+				
+				if(lightningMode == false){
+					c.fillText("Powerup Mode DEACTIVATED" , 50, 750);
+				
+				
+				}
+			}
+			zues.draw();
+			dragon.draw();
+			
+			minotaur.draw();
+			
+			spear.draw();
+			
+			powerup.draw();
+			
+			for(i = 0; i < 100; i++){
+				fireballArray[i].draw();
+			}
+			
+			for(i = 0; i < 100; i++){
+				lightningArray[i].draw();
+				
+			}
+			
+			if(gameState == "gameover"){
+				c.drawImage(backImg, 0, 0, cWidth, cHeight);
+				c.fillStyle="rgb(255,255,255)";
+				c.font="24px Arial";
+				c.fillText("GAME OVER! Press P to try again!", 250, 550);
+				c.fillText("Your final distance was " + Math.round(finalDistance) + "m" , 250, 650);
+				
+				c.fillText( "1st Place: " + Math.round(scoreArray[8]) , 50, 650);
+				if(Attempts => 1){
+					c.fillText("2nd Place: " + Math.round(scoreArray[7]) , 50, 680);
+					
+				}
+				
+				if(Attempts => 2){
+					c.fillText("3rd Place: " + Math.round(scoreArray[6]) , 50, 710);
+					
+				}
+				
+				if(Attempts => 3){
+					c.fillText( "4th Place: " + Math.round(scoreArray[5]) , 50, 740);
+					
+				}
+				
+				if(Attempts => 4){
+					c.fillText( "5th Place: " + Math.round(scoreArray[4]) , 50, 770);
+					
+				}
+			}
+			
+			if(gameState == "intro"){
+				c.drawImage(backIntroImg, 0, 0, cWidth, cHeight);
+				c.fillStyle="rgb(255,255,255)";
+				c.font="24px Arial";
+				c.drawImage(titleImg, 50, 100, 500, 250);
+				
+				c.drawImage(PImg, 50, 450, 400, 150);
+				
+				c.drawImage(IImg, 50, 650, 500, 150);
+				
+			
+			}
+			
+			if(gameState == "instructions"){
+				c.drawImage(backIntroImg, 0, 0, cWidth, cHeight);
+				c.drawImage(instruct1Img, 10, 50, 650, 50);
+				c.drawImage(instruct2Img, 10, 150, 650, 50);
+				c.drawImage(instruct3Img, 10, 250, 450, 50);
+				c.drawImage(instruct4Img, 10, 450, 750, 150);
+				
+				c.drawImage(PImg, 25, 750, 200, 50);
+			
+			
+			}
+			
+			
+			
+
+		}
+
+
+	</script>
+
+</head>
+
+
+<body onload="gameFrameworkInit()">
+	
+	<canvas id="myCanvas" width="800" height="800"></canvas>
+
+</body>
+
+</html>
